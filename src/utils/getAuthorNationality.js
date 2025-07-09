@@ -7,7 +7,6 @@ export async function getAuthorNationality(authorName) {
     try {
       const res = await fetch(url);
       const data = await res.json();
-      console.log("🟡 QID Search Result for", authorName, data);
       if (data.search && data.search.length > 0) {
         return data.search[0].id;
       }
@@ -39,7 +38,6 @@ export async function getAuthorNationality(authorName) {
         },
       });
       const data = await res.json();
-      console.log("🟢 Nationality Query Result for QID", qid, data);
       const len = data.results.bindings.length;
       if (len > 0) {
         return data.results.bindings[0].countryLabel.value;
@@ -53,7 +51,6 @@ export async function getAuthorNationality(authorName) {
   const qid = await getQId(authorName);
 
   if (!qid) {
-    console.log(`No QID found for author: "${authorName}"`);
     return "unknown";
   }
 

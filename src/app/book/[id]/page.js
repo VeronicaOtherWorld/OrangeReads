@@ -5,6 +5,8 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ChatBotModal from "@/components/chatBotModal";
 import { useParams, useSearchParams } from "next/navigation";
+import { useCartStore } from "@/stores/cartStore";
+import toast from "react-hot-toast";
 
 const ReadingMap = dynamic(() => import("@/components/map"), { ssr: false });
 
@@ -12,13 +14,21 @@ export default function BookDetailPage() {
   const params = useSearchParams();
   const route = useParams();
 
+  const addToCart = useCartStore((state) => state.addToCart);
+
+  const handleAdd = () => {
+    addToCart(book);
+    //toast
+    toast.success(`successfully added ${book.title} to your cart`);
+  };
+
   const book = {
     id: route.id,
     title: params.get("title"),
     author: params.get("author"),
     nationality: params.get("nationality"),
     price: parseFloat(params.get("price")),
-    cover: params.get("cover"),
+    cover: decodeURIComponent(params.get("cover")),
     description: params.get("description"),
   };
   const [expanded, setExpanded] = useState(false);
@@ -70,7 +80,10 @@ export default function BookDetailPage() {
                     <p className="text-lg font-semibold mt-2">
                       €{book.price.toFixed(2)}
                     </p>
-                    <button className="self-center md:self-start mt-1 px-4 py-2 bg-black text-white text-sm rounded-md">
+                    <button
+                      className="self-center md:self-start mt-1 px-4 py-2 bg-black text-white text-sm rounded-md cursor-pointer"
+                      onClick={handleAdd}
+                    >
                       ADD TO CART
                     </button>
                   </div>

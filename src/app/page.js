@@ -67,7 +67,7 @@ export default function HomePage() {
                         const query = new URLSearchParams({
                           title: item.title,
                           author: item.author,
-                          cover: item.cover,
+                          cover: encodeURIComponent(item.cover),
                           nationality: item.nationality,
                           price: item.price.toString(),
                           description: item.description,

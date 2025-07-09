@@ -1,35 +1,56 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { useCartStore } from "@/stores/cartStore";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 export default function ShoppingCart() {
-  const cartItems = [
-    {
-      id: 1,
-      title: "Until August",
-      author: "Gabriel García Márquez",
-      price: 28.3,
-      quantity: 1,
-      image: "/until-august.jpg",
-    },
-    {
-      id: 2,
-      title: "1984",
-      author: "Gabriel García Márquez",
-      price: 11.9,
-      quantity: 1,
-      image: "/until-august.jpg",
-    },
-    {
-      id: 3,
-      title: "little prince",
-      author: "Gabriel García Márquez",
-      price: 23.0,
-      quantity: 1,
-      image: "/until-august.jpg",
-    },
-  ];
+  // router
+  const router = useRouter();
+  const {
+    cartItems,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCartStore();
+
+  // checkout logic
+  const [isPaying, setIsPaying] = useState(false);
+
+  // mock
+  const userId = "user_001";
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      toast.error("there is empty");
+      return;
+    }
+    // paying
+    setIsPaying(true);
+
+    // post endpoint
+    //start checking out
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, cartItems }),
+      });
+
+      if (!res.ok) throw new Error("failed");
+      toast.success("payment successful!");
+      clearCart();
+      router.push("/readingmap");
+    } catch (err) {
+      console.error(err);
+      toast.error("something is going wrong ,try again");
+    } finally {
+      setIsPaying(false);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -48,15 +69,12 @@ export default function ShoppingCart() {
           </div>
         </div>
         {cartItems.map((item) => (
-          <div className="">
-            <div
-              key={item.id}
-              className="grid grid-cols-5 items-center py-4 border-b text-sm text-center"
-            >
+          <div key={item.id}>
+            <div className="grid grid-cols-5 items-center py-4 border-b text-sm text-center">
               {/* type */}
               <div>
                 <img
-                  src={item.image}
+                  src={item.cover}
                   alt={item.title}
                   className="w-16 h-20 object-cover mx-auto rounded"
                 />
@@ -74,11 +92,26 @@ export default function ShoppingCart() {
               {/* quantity */}
               <div>
                 <div className="flex justify-center items-center gap-2">
-                  <button className="px-2">-</button>
+                  <button
+                    className="px-2"
+                    onClick={() => decreaseQuantity(item.id)}
+                  >
+                    -
+                  </button>
                   <span>{item.quantity}</span>
-                  <button className="px-2">+</button>
+                  <button
+                    className="px-2"
+                    onClick={() => increaseQuantity(item.id)}
+                  >
+                    +
+                  </button>
                 </div>
-                <button className="text-xs text-red-500 mt-3">remove</button>
+                <button
+                  className="text-xs text-red-500 mt-3"
+                  onClick={() => removeFromCart(item.id)}
+                >
+                  remove
+                </button>
               </div>
 
               {/* total */}
@@ -93,7 +126,6 @@ export default function ShoppingCart() {
         <div className="flex justify-end mt-6 text-sm font-medium">
           <span className="mr-2">substotal:</span>
           <span>
-            €{" "}
             {cartItems
               .reduce((total, item) => total + item.price * item.quantity, 0)
               .toFixed(2)}
@@ -101,7 +133,11 @@ export default function ShoppingCart() {
         </div>
         {/*checkout*/}
         <div className="flex justify-end mt-4 mb-16">
-          <button className="bg-black text-white px-6 py-2 rounded">
+          <button
+            className="bg-black text-white px-6 py-2 rounded"
+            onClick={handleCheckout}
+            disabled={isPaying}
+          >
             checkout
           </button>
         </div>

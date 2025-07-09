@@ -4,7 +4,7 @@ import { formatBookData } from "./formatBookData";
 import { saveToMongoDB } from "./saveToMongoDB";
 
 export async function fetchAndSaveBook() {
-  console.log("🔥 fetchAndSaveBook() STARTED");
+  console.log("fetchAndSaveBook() STARTED");
 
   const keywords = [
     "Irish literature",
@@ -21,7 +21,6 @@ export async function fetchAndSaveBook() {
   let totalSaved = 0;
 
   for (const keyword of keywords) {
-    console.log(`fetching for keyword: "${keyword}"`);
     let startIndex = 0;
 
     while (startIndex < maxResults * maxPagesPerKeyword) {
@@ -34,9 +33,6 @@ export async function fetchAndSaveBook() {
 
         const nationality = await getAuthorNationality(author);
         if (!nationality || nationality === "unknown") {
-          console.log(
-            `skipped: ${rawBook.volumeInfo?.title} - Unknown nationality`
-          );
           continue;
         }
 
@@ -48,6 +44,4 @@ export async function fetchAndSaveBook() {
       startIndex += maxResults;
     }
   }
-
-  console.log(`✅ Finished fetching and saving. Total saved: ${totalSaved}`);
 }
