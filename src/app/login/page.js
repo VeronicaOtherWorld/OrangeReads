@@ -2,18 +2,61 @@
 import { useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import axios from "@/lib/axios";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      alert("enter email or password!");
+      return;
+    }
+
     if (isLogin) {
-      console.log("logging", email, password);
+      console.log("loggin", email, password);
+      const res = await axios.post(
+        "/auth/login",
+        { email, password },
+        { validateStatus: () => true }
+      );
+
+      if (res.status === 200) {
+        alert("login successfully");
+        router.push("/");
+      } else if (res.status === 404) {
+        alert("not found");
+      } else if (res.status === 401) {
+        alert("invalid password");
+      } else {
+        alert(res.data?.error || "failure");
+      }
     } else {
       console.log("registering", email, password);
+
+      const res = await axios.post(
+        "/auth/register",
+        {
+          email,
+          password,
+        },
+        { validateStatus: () => true }
+      );
+
+      if (res.status === 201) {
+        alert("success");
+        setIsLogin(true);
+      } else if (res.status === 409) {
+        alert("user exists");
+      } else {
+        alert("failure" + res.data?.error);
+      }
     }
   };
 
@@ -91,7 +134,7 @@ export default function LoginPage() {
                 <div className="text-sm mt-4 text-center">
                   have an account?
                   <span
-                    className="text-yellow-500 cursor-pointer"
+                    className="text-yellow-500 cursor-pointer "
                     onClick={() => setIsLogin(true)}
                   >
                     login

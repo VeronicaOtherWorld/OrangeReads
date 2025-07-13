@@ -1,5 +1,5 @@
-import { authors } from "@/data/sampleData";
 import clientPromise from "@/lib/mongo";
+import { NextResponse } from "next/server";
 import { getAuthorNationality } from "@/utils/getAuthorNationality";
 
 export async function GET() {
@@ -11,8 +11,12 @@ export async function GET() {
       .find({ nationality: { $exists: true, $ne: "" } })
       .limit(15)
       .toArray();
-    return Response.json({ books });
+    return NextResponse.json({ books });
   } catch (err) {
     console.error(err);
+    return NextResponse.json(
+      { error: "Failed to fetch books" },
+      { status: 500 }
+    );
   }
 }

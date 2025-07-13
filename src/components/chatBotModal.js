@@ -96,7 +96,7 @@ export default function ChatBotModal({
                     className="flex-1 outline-none text-sm"
                   ></input>
                   <button type="submit" className="text-orange-600">
-                    ➡️
+                    submit
                   </button>
                 </form>
               </div>

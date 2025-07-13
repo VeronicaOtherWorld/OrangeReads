@@ -42,6 +42,8 @@ const BookPostModal = ({ isOpen, onClose, initialData, onSubmit }) => {
             {initialData ? "Edit" : "New"}
           </DialogTitle>
 
+          {/* title */}
+
           <input
             type="text"
             placeholder="post title"
@@ -50,6 +52,7 @@ const BookPostModal = ({ isOpen, onClose, initialData, onSubmit }) => {
             required
             onChange={(e) => setTitle(e.target.value)}
           />
+          {/* content */}
 
           <textarea
             placeholder="description"

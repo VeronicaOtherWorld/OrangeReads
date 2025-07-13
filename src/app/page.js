@@ -2,18 +2,12 @@
 import Link from "next/link";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import Genre from "@/components/genre";
 import BookCard from "@/components/bookCard";
 import AIBot from "@/components/aiBot";
-import dynamic from "next/dynamic";
-import { books, authors } from "@/data/sampleData";
 import BookCardSkeleton from "@/components/bookCardSkeleton";
-import { TrendingUp, BookOpen, Users, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// const ReadingMap = dynamic(() => import("@/components/readingMap"), {
-//   ssr: false,
-// });
+import axios from "axios";
 
 const bookSections = ["Bestsellers", "New Arrivals", "For you"];
 export default function HomePage() {
@@ -23,24 +17,29 @@ export default function HomePage() {
 
   // get home page books
   useEffect(() => {
-    fetch("/api/homeBooks")
-      .then((res) => res.json())
-      .then((data) => {
-        setBooks(data.books);
+    (async () => {
+      try {
+        const res = await axios.get("/api/homeBooks", {
+          withCredentials: false,
+          validateStatus: () => true,
+        });
+        setBooks(res.data.books);
+      } catch (err) {
+        console.error("Failed to load books:", err);
+      } finally {
         setIsLoading(false);
-      });
+      }
+    })();
   }, []);
   return (
     <div className="min-h-screen bg-white text-gray-800">
       {/* nav bar*/}
       <Header />
-      {/* genre*/}
-      <Genre />
       {/* hero section*/}
       <div>
-        <div className="flex justify-center items-center">
-          explore reading map
-        </div>
+        <h1 className="flex justify-center items-center text-7xl">
+          Explore your reading map
+        </h1>
       </div>
       {/* book sections*/}
       {bookSections.map((section, sectionIndex) => (
