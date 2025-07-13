@@ -1,29 +1,18 @@
 import { authors } from "@/data/sampleData";
+import clientPromise from "@/lib/mongo";
 import { getAuthorNationality } from "@/utils/getAuthorNationality";
 
 export async function GET() {
-  const res = await fetch(
-    "https://www.googleapis.com/books/v1/volumes?q=bestseller+novel&maxResults=15"
-  );
-
-  const data = await res.json();
-
-  const books = await Promise.all(
-    data.items?.map(async (item) => {
-      const info = item.volumeInfo;
-      const author = info.authors?.[0] || "Unknown";
-      const nationality = await getAuthorNationality(author);
-      return {
-        id: item.id,
-        title: info.title || "Unknown",
-        author,
-        description: info.description || "No description",
-        cover: info.imageLinks?.thumbnail || null,
-        nationality: nationality || "Unknown",
-        price: Math.floor(Math.random() * 20) + 10,
-      };
-    })
-  );
-
-  return Response.json({ books });
+  try {
+    const client = await clientPromise;
+    const db = client.db();
+    const books = await db
+      .collection("books")
+      .find({ nationality: { $exists: true, $ne: "" } })
+      .limit(15)
+      .toArray();
+    return Response.json({ books });
+  } catch (err) {
+    console.error(err);
+  }
 }
