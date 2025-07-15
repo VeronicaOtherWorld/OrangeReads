@@ -1,17 +1,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import axios from "@/lib/axios";
+import myAxios from "@/lib/myAxios";
+import useUser from "@/hooks/useUser";
 
 export default function Header() {
   // user
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-    axios.get("/auth/me", { validateStatus: () => true }).then((res) => {
-      if (res.status === 200) {
-        setUser(res.data.user);
-      }
-    });
-  }, []);
+  const { user, checking } = useUser();
+
   // modify the email, not show the whole email address
   const maskEmail = (email) => {
     const [name, domain] = email.split("@");
@@ -21,7 +16,7 @@ export default function Header() {
 
   const handleLogout = async () => {
     // log out
-    await axios.post("/auth/logout");
+    await myAxios.post("/auth/logout");
     // refresh page
     location.reload();
   };
@@ -43,7 +38,9 @@ export default function Header() {
         </Link>
       </nav>
       {/*login or show user info */}
-      {user ? (
+      {checking ? (
+        <div className="text-sm text-gray-500">Checking...</div>
+      ) : user ? (
         <div className="flex flex-col items-end text-sm">
           <span className="text-gray-700">{maskEmail(user.email)}</span>
           <button

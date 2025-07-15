@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongo";
 import { ObjectId } from "mongodb";
 import { nanoid } from "nanoid";
+import { verifyJWT } from "@/utils/verifyJWT";
 
 export async function POST(req) {
   // in case the country name is not match
@@ -12,13 +13,24 @@ export async function POST(req) {
     "South Korea": "Republic of Korea",
   };
 
+  // get the token
   try {
-    // const { userId, cartItems } = await req.json();
-    // fix userId for test TODO
-    const userId = "user001";
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "not auth" }, { status: 401 });
+    }
+    let decoded;
+    try {
+      decoded = verifyJWT(token);
+    } catch (err) {
+      console.error(err);
+      return NextResponse.json({ error: "invalid token" }, { status: 403 });
+    }
+
+    const userId = decoded.userId;
     const { cartItems } = await req.json();
     if (!userId || !cartItems || cartItems.length <= 0) {
-      return NextResponse.json({ erorr: "missing info" }, { status: 400 });
+      return NextResponse.json({ error: "missing info" }, { status: 400 });
     }
 
     const client = await clientPromise;

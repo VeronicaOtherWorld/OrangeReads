@@ -5,6 +5,9 @@ import Footer from "@/components/footer";
 import PostCard from "@/components/postCard";
 import BookPostModal from "@/components/bookPostModal";
 import toast, { Toaster } from "react-hot-toast";
+import myAxios from "@/lib/myAxios";
+import useUser from "@/hooks/useUser";
+
 const posts = [
   {
     id: 1,
@@ -49,7 +52,7 @@ export default function BookExchange() {
     console.log("submit", description);
     console.log("submit", img);
     try {
-      const res = await fetch("/api/posts", {
+      const res = await fetch("/posts/putPost", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, description, img }),

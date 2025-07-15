@@ -1,8 +1,20 @@
 import clientPromise from "@/lib/mongo";
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-
+import { verifyJWT } from "@/utils/verifyJWT";
 export async function POST(req) {
+  let decoded;
+  try {
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "not auth" }, { status: 401 });
+    }
+    decoded = verifyJWT(token);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "invalid token" }, { status: 403 });
+  }
+  const userId = decoded.userId;
   try {
     const { title, description, img } = await req.json();
     if (!title || !description) {
@@ -17,7 +29,7 @@ export async function POST(req) {
 
     const post = {
       id: "post_" + nanoid(8),
-      posterId: "user001",
+      posterId: userId,
       postContent: description,
       responserId: "",
       createdAt: new Date(),

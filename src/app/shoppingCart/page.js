@@ -1,11 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { useCartStore } from "@/stores/cartStore";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import myAxios from "@/lib/myAxios";
+import useUser from "@/hooks/useUser";
+
 export default function ShoppingCart() {
   // router
   const router = useRouter();
@@ -20,12 +23,24 @@ export default function ShoppingCart() {
   // checkout logic
   const [isPaying, setIsPaying] = useState(false);
 
-  // mock
-  const userId = "user_001";
+  // userid
+  const { user, checking } = useUser();
+  const userId = user?.userId;
+
+  useEffect(() => {
+    if (!checking && !user) {
+      toast.error("please login");
+      router.push("/login");
+    }
+  }, [checking, user, router]);
 
   const handleCheckout = async () => {
     if (cartItems.length === 0) {
-      toast.error("there is empty");
+      toast.error("Your cart is empty");
+      return;
+    }
+    if (!userId) {
+      toast.error("Please login to continue");
       return;
     }
     // paying
@@ -34,23 +49,18 @@ export default function ShoppingCart() {
     // post endpoint
     //start checking out
     try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, cartItems }),
-      });
-
-      if (!res.ok) throw new Error("failed");
-      toast.success("payment successful!");
+      const res = await myAxios.post("/checkout", { userId, cartItems });
+      toast.success("Payment successful!");
       clearCart();
       router.push("/readingmap?paid=true");
     } catch (err) {
       console.error(err);
-      toast.error("something is going wrong ,try again");
+      toast.error("Something went wrong. Try again.");
     } finally {
       setIsPaying(false);
     }
   };
+  if (checking || !userId) return <div className="p-8">Loading...</div>;
 
   return (
     <div className="min-h-screen">

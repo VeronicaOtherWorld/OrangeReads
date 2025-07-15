@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import axios from "@/lib/axios";
+import myAxios from "@/lib/myAxios";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -21,7 +21,7 @@ export default function LoginPage() {
 
     if (isLogin) {
       console.log("loggin", email, password);
-      const res = await axios.post(
+      const res = await myAxios.post(
         "/auth/login",
         { email, password },
         { validateStatus: () => true }
@@ -40,7 +40,7 @@ export default function LoginPage() {
     } else {
       console.log("registering", email, password);
 
-      const res = await axios.post(
+      const res = await myAxios.post(
         "/auth/register",
         {
           email,
