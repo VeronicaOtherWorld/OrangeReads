@@ -2,35 +2,37 @@
 
 import { useState, useEffect } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { toBase64 } from "@/utils/toBase64";
 
 const BookPostModal = ({ isOpen, onClose, initialData, onSubmit }) => {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [postContent, setPostContent] = useState("");
   const [img, setImg] = useState(null);
 
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || "");
-      setDescription(initialData.description || "");
+      setPostContent(initialData.postContent || "");
     } else {
       setTitle("");
-      setDescription("");
+      setPostContent("");
     }
   }, [initialData, isOpen]);
 
   const handleSubmit = () => {
-    if (!title || !description) {
-      alert("Please fill in both title and description.");
+    if (!title || !postContent) {
+      alert("Please fill in both title and post Content.");
       return;
     }
-    onSubmit({ title, description, img });
+    onSubmit({ title, postContent, img });
     onClose();
   };
 
-  const handleImgChange = (e) => {
+  const handleImgChange = async (e) => {
     const file = e.target.files?.[0];
+    const img = await toBase64(file);
     if (file) {
-      setImg(URL.createObjectURL(file));
+      setImg(img);
     }
   };
   return (
@@ -55,11 +57,11 @@ const BookPostModal = ({ isOpen, onClose, initialData, onSubmit }) => {
           {/* content */}
 
           <textarea
-            placeholder="description"
+            placeholder="postContent"
             className="w-full border p-2 mb-4 rounded h-64"
-            value={description}
+            value={postContent}
             required
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => setPostContent(e.target.value)}
           ></textarea>
 
           {/* upload img*/}

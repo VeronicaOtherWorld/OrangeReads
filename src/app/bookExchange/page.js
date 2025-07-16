@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import PostCard from "@/components/postCard";
@@ -8,34 +8,28 @@ import toast, { Toaster } from "react-hot-toast";
 import myAxios from "@/lib/myAxios";
 import useUser from "@/hooks/useUser";
 
-const posts = [
-  {
-    id: 1,
-    title: "Looking to swap '1984' for 'Brave New World'",
-    description:
-      "Good condition copy of Orwell's '1984'. Hoping to find a swap for Huxley's novel.",
-  },
-  {
-    id: 2,
-    title: "Looking to swap 'litte prince' for 'new world'",
-    description: "I live in Dublin, looking forward change it in person",
-  },
-  {
-    id: 3,
-    title: "Looking to swap '1984' for 'Brave New World'",
-    description:
-      "Good condition copy of Orwell's '1984'. Hoping to find a swap for Huxley's novel.",
-  },
-  {
-    id: 4,
-    title: "Looking to swap 'litte prince' for 'new world'",
-    description: "I live in Dublin, looking forward change it in person",
-  },
-];
-
 export default function BookExchange() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
+  // get method, get all posts from db
+  const [posts, setPosts] = useState([]);
+
+  const { user } = useUser();
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  // fetch posts
+  const fetchPosts = async () => {
+    try {
+      const res = await myAxios.get("/posts/getPosts");
+      setPosts(res.data);
+    } catch (error) {
+      console.error(error);
+      toast.error("failed to load post");
+    }
+  };
 
   const handleCreate = () => {
     setEditingPost(null);
@@ -47,27 +41,33 @@ export default function BookExchange() {
   //   setIsModalOpen(true);
   // };
 
-  const handleSubmit = async ({ title, description, img }) => {
-    console.log("submit", title);
-    console.log("submit", description);
-    console.log("submit", img);
+  const handleSubmit = async ({ title, postContent, img }) => {
+    console.log("title", title);
+    console.log("postContent", postContent);
+    console.log("img", img);
+    if (!user) {
+      toast.error("please login before posting");
+      return;
+    }
+
     try {
-      const res = await fetch("/posts/putPost", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, img }),
+      const res = await myAxios.post("/posts/putPost", {
+        title,
+        postContent,
+        img,
       });
-      if (!res.ok) {
-        const err = await res.json();
-        toast.error("Failed to post: " + err.error);
+      if (res.status !== 200) {
+        toast.error("fail to post: " + res.data?.error);
         return;
-      } else {
-        toast.success("Post created successfully");
       }
-      const result = await res.json();
-      console.log("posted", result);
+      toast.success("post successfully!");
+      //fetch posts
+      // rerender posts
+      fetchPosts();
+      setIsModalOpen(false);
     } catch (error) {
       console.error(error);
+      toast.error("sth went wrong");
     }
     setIsModalOpen(false);
   };

@@ -1,5 +1,3 @@
-import { Star, Users, Calendar } from "lucide-react";
-
 export default function BookCard({ book }) {
   return (
     <div className="flex flex-col items-center bg-white border-y-amber-200 p-4 shadow-sm hover:shadow-md transition w-full h-full">

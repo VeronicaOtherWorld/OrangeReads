@@ -32,12 +32,15 @@ export default function UserCountryMap({ GeoJsonUrl = "/countries.geojson" }) {
         // fetch highlighted countreis
         const mapRes = await myAxios.get(`/mapdata?userId=${userId}`);
         const mapData = mapRes.data;
+        console.log(mapData, "mapdata");
 
         if (mapData?.countryBooks) {
           const map = {};
           mapData.countryBooks.forEach((item) => {
             map[item.country] = item.titles || [];
           });
+          // console.log(map, "mapppp");
+
           setUserData(map);
         }
       } catch (error) {
@@ -64,8 +67,8 @@ export default function UserCountryMap({ GeoJsonUrl = "/countries.geojson" }) {
     const isActive = len > 0;
     const fillColor = getColour(len);
 
-    // console.log("countryName from map:", countryName);
-    // console.log("userData:", userData);
+    console.log("countryName from map:", countryName);
+    console.log("-----userData------:", userData);
 
     layer.setStyle({
       fillColor,
@@ -110,7 +113,9 @@ export default function UserCountryMap({ GeoJsonUrl = "/countries.geojson" }) {
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://osm.org">OpenStreetMap</a>'
         ></TileLayer>
-        <GeoJSON data={geoData} onEachFeature={onEachFeature}></GeoJSON>
+        {Object.keys(userData).length > 0 && (
+          <GeoJSON data={geoData} onEachFeature={onEachFeature} />
+        )}
       </MapContainer>
     </div>
   );

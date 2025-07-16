@@ -17,7 +17,7 @@ export default function ReadingMapPage() {
         <h1 className="text-2xl font-bold mb-4">Your Reading Map</h1>
         <Suspense fallback={<div>Loading map...</div>}>
           {/* fetch local geojson data */}
-          <UserCountryMap geoJsonUrl="/countries.geojson" />
+          <UserCountryMap GeoJsonUrl="/countries.geojson" />
         </Suspense>
       </div>
       <Footer />

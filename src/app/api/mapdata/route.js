@@ -27,6 +27,7 @@ export async function GET(req) {
   }
 
   const userId = decoded.userId;
+  console.log("decoded:", decoded);
   if (!userId) {
     return NextResponse.json({ error: "No user ID" }, { status: 400 });
   }
