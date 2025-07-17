@@ -13,9 +13,11 @@ const BookPostModal = ({ isOpen, onClose, initialData, onSubmit }) => {
     if (initialData) {
       setTitle(initialData.title || "");
       setPostContent(initialData.postContent || "");
+      setImg(initialData.img || null);
     } else {
       setTitle("");
       setPostContent("");
+      setImg(null);
     }
   }, [initialData, isOpen]);
 
