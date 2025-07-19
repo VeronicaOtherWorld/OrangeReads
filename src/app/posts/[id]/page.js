@@ -117,11 +117,9 @@ export default function PostDetail() {
           </div>
 
           {/* post content */}
-          <div className="text-base leading-relaxed  border-b-4 border-amber-600 border-dotted pb-8">
-            {post.postContent}
-          </div>
+          <div className="text-base leading-relaxed">{post.postContent}</div>
         </div>
-        <div className="">
+        <div className=" border-b-4 border-amber-600 border-dotted pb-4">
           {/*  <button className="px-4 py-2 bg-amber-500 rounded text-white">
             Reply
           </button>

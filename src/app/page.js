@@ -3,23 +3,25 @@ import Link from "next/link";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import BookCard from "@/components/bookCard";
-import AIBot from "@/components/aiBot";
 import BookCardSkeleton from "@/components/bookCardSkeleton";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import myAxios from "@/lib/myAxios";
+import ChatBotModal from "@/components/chatBotModal";
+import useUser from "@/hooks/useUser";
+import toast from "react-hot-toast";
 
 const bookSections = ["Bestsellers", "New Arrivals", "For you"];
 export default function HomePage() {
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-
+  const { user } = useUser();
   // get home page books
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get("/api/homeBooks", {
+        const res = await myAxios.get("/homeBooks", {
           withCredentials: false,
           validateStatus: () => true,
         });
@@ -31,22 +33,111 @@ export default function HomePage() {
       }
     })();
   }, []);
+
+  // ai bot
+  const [isChatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+
+  const handleSendMessage = async (userMsg) => {
+    if (!user) {
+      toast.error("Please login to use the AI bot");
+      return;
+    }
+
+    // user message + typing...
+    setMessages((prev) => [
+      ...prev,
+      { from: "user", text: userMsg },
+      { from: "bot", text: "typing..." },
+    ]);
+
+    try {
+      const res = await myAxios.post("/ollama", {
+        prompt: userMsg,
+        userId: user?.userId,
+        bookId: null,
+        content: "book-page",
+        promptType: "user",
+      });
+
+      const aiText = res.data.response;
+      setMessages((prev) => {
+        const updated = [...prev];
+        //remove typing
+        updated.pop();
+        return [...updated, { from: "bot", text: aiText }];
+      });
+    } catch (error) {
+      setMessages((prev) => {
+        const updated = [...prev];
+        //remove typing
+        updated.pop();
+        return [
+          ...updated,
+          { from: "bot", text: "Sorry, I couldn't get a response." },
+        ];
+      });
+    }
+  };
   return (
     <div className="min-h-screen bg-white text-gray-800">
       {/* nav bar*/}
       <Header />
       {/* hero section*/}
-      <div>
-        <h1 className="flex justify-center items-center text-7xl">
-          Explore your reading map
-        </h1>
+      {/* promote reading map section */}
+      <div
+        className="relative mx-auto my-10 max-w-6xl h-[450px] rounded-xl overflow-hidden shadow-md"
+        style={{
+          backgroundImage: `url('/map.png')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* cover */}
+        <div className="absolute inset-0 bg-white/70 z-10" />
+
+        {/* content */}
+        <div className="relative z-20 h-full flex flex-col justify-center items-center text-center px-4">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
+            Explore your reading map!
+          </h2>
+
+          {!user ? (
+            <>
+              <p className="text-gray-700 text-base sm:text-lg mb-4">
+                Login to unlock your reading map and see where your books come
+                from.
+              </p>
+              <Link href="/login">
+                <button className="cursor-pointer bg-white border border-amber-400 text-amber-500 hover:bg-amber-100 px-6 py-2 rounded-lg font-medium transition">
+                  Login to explore
+                </button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-gray-700 text-base sm:text-lg mb-4">
+                You have started your book journey, see your reading path on the
+                map!
+              </p>
+              <Link href="/readingmap">
+                <button className="bg-amber-400 text-white hover:bg-amber-500 px-6 py-2 rounded-lg font-medium transition">
+                  Go to Reading Map
+                </button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
       {/* book sections*/}
       {bookSections.map((section, sectionIndex) => (
         <div key={section} className="px-6 py-8">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4 px-2 sm:px-0 max-w-[1100px] mx-auto">
             <h2 className="text-xl font-bold">{section}</h2>
-            <Link href="/filterByCountry" className="text-orange-400 text-sm">
+            <Link
+              href="/filterByCountry"
+              className="text-orange-400 text-sm font-semibold hover:font-bold hover:text-amber-700"
+            >
               find more
             </Link>
           </div>
@@ -80,6 +171,15 @@ export default function HomePage() {
           </div>
         </div>
       ))}
+      {/* chat bot*/}
+      <ChatBotModal
+        isOpen={isChatOpen}
+        onOpen={() => setChatOpen(true)}
+        onClose={() => setChatOpen(false)}
+        messages={messages}
+        setMessages={setMessages}
+        onSendMessage={handleSendMessage}
+      ></ChatBotModal>
       {/* foot */}
       <Footer />
     </div>

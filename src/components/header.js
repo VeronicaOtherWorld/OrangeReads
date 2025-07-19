@@ -22,19 +22,39 @@ export default function Header() {
     location.reload();
   };
   return (
-    <header className="flex justify-between items-center px-6 py-4 shadow-amber-50">
-      <div>logo</div>
+    <header className="flex flex-col sm:flex-row items-center sm:justify-between gap-4 px-6 py-4 shadow-amber-50">
+      <div className="flex flex-wrap justify-center items-center gap-4">
+        <Link href="/">
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="w-10 h-10 object-contain cursor-pointer"
+          />
+        </Link>
+      </div>
       <nav className="flex space-x-4">
-        <Link href="/" className="hover:text-orange-200">
+        <Link
+          href="/"
+          className="hover:text-orange-400 hover:font-bold text-sm font-semibold"
+        >
           Home
         </Link>
-        <Link href="/readingmap" className="hover:text-orange-200">
+        <Link
+          href="/readingmap"
+          className="hover:text-orange-400 hover:font-bold text-sm font-semibold"
+        >
           Reading map
         </Link>
-        <Link href="/bookExchange" className="hover:text-orange-200">
+        <Link
+          href="/bookExchange"
+          className="hover:text-orange-400 hover:font-bold text-sm font-semibold"
+        >
           Book Exchange
         </Link>
-        <Link href="/shoppingCart" className="hover:text-orange-200">
+        <Link
+          href="/shoppingCart"
+          className="hover:text-orange-400 hover:font-bold text-sm font-semibold"
+        >
           Cart
         </Link>
       </nav>

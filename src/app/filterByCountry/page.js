@@ -4,8 +4,10 @@ import BookCard from "@/components/bookCard";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import BookCardSkeleton from "@/components/bookCardSkeleton";
-
-import Link from "next/link";
+import ChatBotModal from "@/components/chatBotModal";
+import useUser from "@/hooks/useUser";
+import toast from "react-hot-toast";
+import myAxios from "@/lib/myAxios";
 import { useRouter } from "next/navigation";
 
 const countries = [
@@ -20,6 +22,9 @@ const countries = [
 export default function FilterByCountry() {
   const [selectedCountry, setSelectedCountry] = useState("All");
   const [books, setBooks] = useState([]);
+  const { user } = useUser();
+  const [isChatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -37,6 +42,46 @@ export default function FilterByCountry() {
       ? books
       : books.filter((item) => item.nationality === selectedCountry);
 
+  const handleSendMessage = async (userMsg) => {
+    if (!user) {
+      toast.error("Please login to use the AI bot");
+      return;
+    }
+
+    setMessages((prev) => [
+      ...prev,
+      { from: "user", text: userMsg },
+      { from: "bot", text: "typing..." },
+    ]);
+
+    try {
+      const res = await myAxios.post("/ollama", {
+        prompt: userMsg,
+        userId: user?.userId,
+        bookId: null,
+        content: "filter-page",
+        promptType: "user",
+      });
+
+      const aiText = res.data.response;
+      setMessages((prev) => {
+        const updated = [...prev];
+        // remove typing
+        updated.pop();
+        return [...updated, { from: "bot", text: aiText }];
+      });
+    } catch (error) {
+      setMessages((prev) => {
+        const updated = [...prev];
+        // remove typing
+        updated.pop();
+        return [
+          ...updated,
+          { from: "bot", text: "Sorry, I couldn't get a response." },
+        ];
+      });
+    }
+  };
   return (
     <div>
       <Header></Header>
@@ -93,6 +138,15 @@ export default function FilterByCountry() {
           )}
         </div>
       </div>
+      {/* chat bot*/}
+      <ChatBotModal
+        isOpen={isChatOpen}
+        onOpen={() => setChatOpen(true)}
+        onClose={() => setChatOpen(false)}
+        messages={messages}
+        setMessages={setMessages}
+        onSendMessage={handleSendMessage}
+      ></ChatBotModal>
       <Footer></Footer>
     </div>
   );

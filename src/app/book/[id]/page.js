@@ -7,10 +7,13 @@ import ChatBotModal from "@/components/chatBotModal";
 import { useParams, useSearchParams } from "next/navigation";
 import { useCartStore } from "@/stores/cartStore";
 import toast from "react-hot-toast";
+import myAxios from "@/lib/myAxios";
+import useUser from "@/hooks/useUser";
 
 const ReadingMap = dynamic(() => import("@/components/map"), { ssr: false });
 
 export default function BookDetailPage() {
+  const { user } = useUser();
   const params = useSearchParams();
   const route = useParams();
 
@@ -33,20 +36,47 @@ export default function BookDetailPage() {
   };
   const [expanded, setExpanded] = useState(false);
   const [isChatOpen, setChatOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { from: "bot", text: "hello! guy!" },
-  ]);
+  const [messages, setMessages] = useState([]);
 
-  const handleSendMessage = (userMsg) => {
-    // add user message
-    setMessages((item) => [...item, { from: "user", text: userMsg }]);
-    // pretend has a response
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { from: "bot", text: "I see. Let me help you with that!" },
-      ]);
-    }, 500);
+  const handleSendMessage = async (userMsg) => {
+    if (!user) {
+      toast.error("Please login to use the AI bot");
+      return;
+    }
+
+    setMessages((prev) => [
+      ...prev,
+      { from: "user", text: userMsg },
+      { from: "bot", text: "typing..." },
+    ]);
+
+    try {
+      const res = await myAxios.post("/ollama", {
+        prompt: userMsg,
+        userId: user?.userId,
+        bookId: book.id,
+        content: "book-page",
+        promptType: "user",
+      });
+
+      const aiText = res.data.response;
+      setMessages((prev) => {
+        const updated = [...prev];
+        // remove "typing..."
+        updated.pop();
+        return [...updated, { from: "bot", text: aiText }];
+      });
+    } catch (error) {
+      setMessages((prev) => {
+        const updated = [...prev];
+        // remove "typing..."
+        updated.pop();
+        return [
+          ...updated,
+          { from: "bot", text: "Sorry, I couldn't get a response." },
+        ];
+      });
+    }
   };
 
   return (
@@ -147,9 +177,10 @@ export default function BookDetailPage() {
         onOpen={() => setChatOpen(true)}
         onClose={() => setChatOpen(false)}
         messages={messages}
+        setMessages={setMessages}
         onSendMessage={handleSendMessage}
       ></ChatBotModal>
-      <Footer></Footer>
+      <Footer />
     </>
   );
 }

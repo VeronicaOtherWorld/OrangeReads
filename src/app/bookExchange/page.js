@@ -76,9 +76,12 @@ export default function BookExchange() {
       <Header />
       <title> book exchange posts </title>
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-4">book exchange posts</h1>
-          <div className="mb-8">
+        <div className="text-center mb-10 ">
+          <h1 className="text-4xl font-bold">book exchange posts</h1>
+          <div className="text-gray-600 mt-4">
+            browse posts from other readers looking to swap books.
+          </div>
+          <div className="mt-4 mb-8">
             <button
               onClick={handleCreate}
               className="px-4 bg-amber-400 text-white rounded hover:bg-amber-700"
@@ -86,10 +89,8 @@ export default function BookExchange() {
               + post
             </button>
           </div>
-          <div className="text-gray-600">
-            browse posts from other readers looking to swap books.
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {posts.map((item) => (
               <PostCard key={item.id} post={item}></PostCard>
             ))}
