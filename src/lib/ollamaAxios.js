@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "https://instantly-improved-pig.ngrok-free.app/api",
+  baseURL: process.env.NEXT_PUBLIC_OLLAMA_API_URL,
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
