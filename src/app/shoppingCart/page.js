@@ -164,7 +164,7 @@ export default function ShoppingCart() {
           <div className="px-8 md-px-32 lg-px-32">
             {/*subtotal*/}
             <div className="flex justify-end mt-6 text-sm font-medium">
-              <span className="mr-2">substotal:</span>
+              <span className="mr-2">substotal: €</span>
               <span>
                 {cartItems
                   .reduce(

@@ -9,6 +9,7 @@ import useUser from "@/hooks/useUser";
 import toast from "react-hot-toast";
 import myAxios from "@/lib/myAxios";
 import { useRouter } from "next/navigation";
+import ollamaAxios from "@/lib/ollamaAxios";
 
 const countries = [
   "All",
@@ -55,7 +56,7 @@ export default function FilterByCountry() {
     ]);
 
     try {
-      const res = await myAxios.post("/ollama", {
+      const res = await ollamaAxios.post("/ollama", {
         prompt: userMsg,
         userId: user?.userId,
         bookId: null,
@@ -63,7 +64,9 @@ export default function FilterByCountry() {
         promptType: "user",
       });
 
-      const aiText = res.data.response;
+      const aiText =
+        res.data.response?.trim() || "Sorry, I didn't get a proper response.";
+
       setMessages((prev) => {
         const updated = [...prev];
         // remove typing

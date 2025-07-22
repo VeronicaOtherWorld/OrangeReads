@@ -10,7 +10,10 @@ export async function POST(req) {
     promptType = "user",
   } = await req.json();
 
-  const finalPrompt = `Please answer briefly and concisely. Limit to 3 sentences.\nUser: ${prompt}`;
+  const finalPrompt = `You are a friendly book expert AI that helps users with questions about books, literature, and authors only.
+If the user's question is unrelated to books or literature, politely decline to answer and remind them that you only discuss books.
+Respond briefly in no more than 3 sentences.
+`;
   const response = await fetch("http://localhost:11434/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -44,6 +47,22 @@ export async function POST(req) {
   } catch (error) {}
   return new Response(JSON.stringify({ response: data.response }), {
     status: 200,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
+}
+
+export async function OPTIONS(req) {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Credentials": "true",
+    },
   });
 }
