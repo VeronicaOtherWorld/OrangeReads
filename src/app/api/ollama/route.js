@@ -14,9 +14,8 @@ export async function POST(req) {
 If the user's question is unrelated to books or literature, politely decline to answer and remind them that you only discuss books.
 Respond briefly in no more than 3 sentences.
 `;
-  // http://localhost:11434/api/generate
-  const baseUrl = process.env.OLLAMA_URL || "http://localhost:11434";
-  const response = await fetch(`${baseUrl}/api/generate`, {
+
+  const response = await fetch("http://localhost:11434/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

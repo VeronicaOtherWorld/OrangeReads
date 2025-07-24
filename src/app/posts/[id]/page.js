@@ -31,6 +31,9 @@ export default function PostDetail() {
   // comments state
   const [comments, setComments] = useState([]);
 
+  // store reply user id
+  const [replyToUserId, setReplyToUserId] = useState(null);
+
   // load post detail
   useEffect(() => {
     const fetchPost = async () => {
@@ -46,6 +49,17 @@ export default function PostDetail() {
     };
     fetchPost();
   }, [id]);
+
+  useEffect(() => {
+    if (user && post) {
+      console.log("🟢 当前登录 user.userId:", user.userId);
+      console.log("📌 帖主 post.posterId:", post.posterId);
+      console.log(
+        "📝 可见 visibleTo:",
+        comments.map((c) => ({ msg: c.msg, visibleTo: c.visibleTo }))
+      );
+    }
+  }, [user, post, comments]);
 
   // load comments, only onwer and poster can see
   const loadComments = async () => {
@@ -159,14 +173,17 @@ export default function PostDetail() {
                 className="px-4 py-2 bg-amber-500 text-white rounded self-center cursor-pointer"
                 onClick={async () => {
                   if (!replyMsg) return;
+                  const targetId = replyToUserId ?? post.posterId;
                   try {
                     await myAxios.post("/comments", {
                       postId: post.id,
                       userId: user.userId,
                       msg: replyMsg,
-                      visibleTo: [user.userId, post.posterId],
+                      visibleTo: [user.userId, targetId],
                     });
                     setReplyMsg("");
+                    // clean the reply user id
+                    setReplyToUserId(null);
                     await loadComments();
                   } catch (error) {
                     console.error(error);
@@ -212,7 +229,10 @@ export default function PostDetail() {
                 {canView && (
                   <button
                     className="text-xs text-green-800 hover:font-bold cursor-pointer"
-                    onClick={() => setReplyMsg(`@${nickname} `)}
+                    onClick={() => {
+                      setReplyToUserId(item.userId);
+                      setReplyMsg(`@${nickname} `);
+                    }}
                   >
                     Reply
                   </button>

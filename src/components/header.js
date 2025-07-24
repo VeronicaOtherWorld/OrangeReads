@@ -8,6 +8,12 @@ export default function Header() {
   // user
   const { user, checking } = useUser();
 
+  // useEffect(() => {
+  //   if (user) {
+  //     console.log("👀 User info:", user);
+  //   }
+  // }, [user]);
+
   // modify the email, not show the whole email address
   const maskEmail = (email) => {
     const [name, domain] = email.split("@");
@@ -63,6 +69,7 @@ export default function Header() {
         <div className="text-sm text-gray-500">Checking...</div>
       ) : user ? (
         <div className="flex flex-col items-end text-sm">
+          <span className="text-gray-500">{user.userId}</span>
           <span className="text-gray-700">{maskEmail(user.email)}</span>
           <button
             onClick={handleLogout}

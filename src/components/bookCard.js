@@ -1,12 +1,16 @@
+import Image from "next/image";
 export default function BookCard({ book }) {
   return (
     <div className="flex flex-col items-center bg-white border-y-amber-200 p-4 shadow-sm hover:shadow-md transition w-full h-full">
       {/* cover */}
       <div className="w-full h-[280px] bg-white rounded-md overflow-hidden mb-3">
-        <img
-          className="w-full h-full object-cover"
+        <Image
           src={book.cover}
           alt={book.title}
+          width={300}
+          height={450}
+          quality={75}
+          loading="lazy"
         />
       </div>
 

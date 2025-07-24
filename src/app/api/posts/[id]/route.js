@@ -2,8 +2,7 @@ import clientPromise from "@/lib/mongo";
 import { NextResponse } from "next/server";
 
 // get post detail
-export async function GET(req, context) {
-  const { params } = await context;
+export async function GET(req, { params }) {
   const id = params.id;
   const client = await clientPromise;
   const db = client.db();
@@ -16,8 +15,7 @@ export async function GET(req, context) {
 }
 
 // put edit update post
-export async function PUT(request, context) {
-  const { params } = await context;
+export async function PUT(request, { params }) {
   const id = params.id;
   const body = await request.json();
   const { title, postContent, img } = body;
@@ -40,8 +38,7 @@ export async function PUT(request, context) {
 }
 
 // delete
-export async function DELETE(_, context) {
-  const { params } = await context;
+export async function DELETE(_, { params }) {
   const id = params.id;
   const client = await clientPromise;
   const db = client.db();

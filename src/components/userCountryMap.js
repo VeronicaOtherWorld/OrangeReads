@@ -4,8 +4,11 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import myAxios from "@/lib/myAxios";
 import useUser from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
 
 export default function UserCountryMap({ GeoJsonUrl = "/countries.geojson" }) {
+  // route
+  const router = useRouter();
   const [geoData, setGeoData] = useState(null);
   const [userData, setUserData] = useState({});
 
@@ -79,7 +82,13 @@ export default function UserCountryMap({ GeoJsonUrl = "/countries.geojson" }) {
 
     if (!isActive) {
       layer.on("click", () => {
-        alert(`You haven't bought books from ${countryName} yet.\nGo explore?`);
+        if (
+          confirm(
+            `You haven't bought books from ${countryName} yet.\nGo explore?`
+          )
+        ) {
+          window.location.href = "/filterByCountry";
+        }
       });
     } else {
       const uniqueTitles = [...new Set(titles)];

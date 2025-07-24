@@ -6,11 +6,8 @@ import BookCard from "@/components/bookCard";
 import BookCardSkeleton from "@/components/bookCardSkeleton";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ollamaAxios from "@/lib/ollamaAxios";
 import myAxios from "@/lib/myAxios";
-import ChatBotModal from "@/components/chatBotModal";
 import useUser from "@/hooks/useUser";
-import toast from "react-hot-toast";
 
 const bookSections = ["Bestsellers", "New Arrivals", "For you"];
 export default function HomePage() {
@@ -35,53 +32,6 @@ export default function HomePage() {
     })();
   }, []);
 
-  // ai bot
-  const [isChatOpen, setChatOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-
-  const handleSendMessage = async (userMsg) => {
-    if (!user) {
-      toast.error("Please login to use the AI bot");
-      return;
-    }
-
-    // user message + typing...
-    setMessages((prev) => [
-      ...prev,
-      { from: "user", text: userMsg },
-      { from: "bot", text: "typing..." },
-    ]);
-
-    try {
-      const res = await ollamaAxios.post("/ollama", {
-        prompt: userMsg,
-        userId: user?.userId,
-        bookId: null,
-        content: "book-page",
-        promptType: "user",
-      });
-
-      const aiText =
-        res.data.response?.trim() || "Sorry, I didn't get a proper response.";
-
-      setMessages((prev) => {
-        const updated = [...prev];
-        //remove typing
-        updated.pop();
-        return [...updated, { from: "bot", text: aiText }];
-      });
-    } catch (error) {
-      setMessages((prev) => {
-        const updated = [...prev];
-        //remove typing
-        updated.pop();
-        return [
-          ...updated,
-          { from: "bot", text: "Sorry, I couldn't get a response." },
-        ];
-      });
-    }
-  };
   return (
     <div className="min-h-screen bg-white text-gray-800">
       {/* nav bar*/}
@@ -174,15 +124,6 @@ export default function HomePage() {
           </div>
         </div>
       ))}
-      {/* chat bot*/}
-      <ChatBotModal
-        isOpen={isChatOpen}
-        onOpen={() => setChatOpen(true)}
-        onClose={() => setChatOpen(false)}
-        messages={messages}
-        setMessages={setMessages}
-        onSendMessage={handleSendMessage}
-      ></ChatBotModal>
       {/* foot */}
       <Footer />
     </div>
