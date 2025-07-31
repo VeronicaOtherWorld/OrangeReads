@@ -162,14 +162,14 @@ export default function BookDetailPage() {
               </div>
             </div>
           </div>
-
-          {/* Reading Map */}
+          {/* Reading Map 
           <div>
             <h2 className="text-xl font-bold text-center">Your reading map</h2>
             <div className="bg-slate-400 h-48 rounded-xl flex items-center justify-center text-white">
               <ReadingMap />
             </div>
           </div>
+          */}
         </div>
       </div>
 

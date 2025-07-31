@@ -25,7 +25,6 @@ export default function HomePage() {
         });
         setBooks(res.data.books);
       } catch (err) {
-        console.error("Failed to load books:", err);
       } finally {
         setIsLoading(false);
       }
@@ -41,7 +40,7 @@ export default function HomePage() {
       <div
         className="relative mx-auto my-10 max-w-6xl h-[450px] rounded-xl overflow-hidden shadow-md"
         style={{
-          backgroundImage: `url('/map.png')`,
+          backgroundImage: `url('/map.webp')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

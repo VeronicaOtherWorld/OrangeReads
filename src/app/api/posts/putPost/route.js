@@ -4,7 +4,6 @@ import { nanoid } from "nanoid";
 import { verifyJWT } from "@/utils/verifyJWT";
 import { cookies } from "next/headers";
 export async function POST(req) {
-  console.log("💡PUT POST API HIT");
   let decoded;
   try {
     const token = cookies().get("token")?.value;
@@ -45,14 +44,12 @@ export async function POST(req) {
       createdAt: new Date(),
       img: img || "",
     };
-    console.log("插入数据：", post);
     await db.collection("swapPost").insertOne(post);
     return NextResponse.json(
       { message: "posted successfully" },
       { status: 200 }
     );
   } catch (err) {
-    console.error("服务器插入失败：", err.message);
     return NextResponse.json({ error: "server error" }, { status: 500 });
   }
 }

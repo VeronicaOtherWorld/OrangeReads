@@ -1,5 +1,3 @@
-import { authors } from "@/data/sampleData";
-
 export function formatBookData(raw, nationality = "") {
   const info = raw.volumeInfo || {};
 

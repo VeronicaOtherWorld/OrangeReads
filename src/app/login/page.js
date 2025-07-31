@@ -20,7 +20,6 @@ export default function LoginPage() {
     }
 
     if (isLogin) {
-      console.log("loggin", email, password);
       const res = await myAxios.post(
         "/auth/login",
         { email, password },
@@ -38,8 +37,6 @@ export default function LoginPage() {
         alert(res.data?.error || "failure");
       }
     } else {
-      console.log("registering", email, password);
-
       const res = await myAxios.post(
         "/auth/register",
         {

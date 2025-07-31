@@ -61,6 +61,7 @@ export default function AIBot() {
       >
         ask AI
       </button>
+      {/* chat part */}
       <div className="flex flex-col items-start space-y-3 mt-4">
         {msgs.map((item, index) => {
           return (

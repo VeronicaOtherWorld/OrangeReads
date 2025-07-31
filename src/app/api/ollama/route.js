@@ -12,8 +12,7 @@ export async function POST(req) {
 
   const finalPrompt = `You are a friendly book expert AI that helps users with questions about books, literature, and authors only.
 If the user's question is unrelated to books or literature, politely decline to answer and remind them that you only discuss books.
-Respond briefly in no more than 3 sentences.
-`;
+Respond briefly in no more than 3 sentences.\nUser: ${prompt}\nAI:`;
 
   const response = await fetch("http://localhost:11434/api/generate", {
     method: "POST",
@@ -28,7 +27,7 @@ Respond briefly in no more than 3 sentences.
 
   const data = await response.json();
   const aiRes = data.response;
-  console.log("Ollama 返回数据：", data);
+  console.log("Ollama return data", data);
 
   // save to db
 
